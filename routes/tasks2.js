@@ -1,37 +1,24 @@
-/*var sql = require('node-sqlserver');
-*//*var conn_str = "Driver={SQL Server Native Client 11.0};Server=(local);Database=AdventureWorks2012;Trusted_Connection={Yes}";
-*/
-var sql = require('mssql'); 
+var sql = require('node-sqlserver');
+var conn_str = "Driver={SQL Server Native Client 11.0};Server=(local);Database=AdventureWorks2012;Trusted_Connection={Yes}";
 
 
 
-var conn_str = {
-    user: 'sa',
-    password: 'root',
-    server: 'localhost', // You can use 'localhost\\instance' to connect to named instance
-    database: 'nodedb',
-
-    options: {
-       // encrypt: true // Use this if you're on Windows Azure
-    }
-}
 
 
 
-var connection = new sql.Connection(conn_str, function(err) {
 
 
-	if (err) {
-		console.log("Problem In opening connection "+err);
-	};
-});
+
 
 
 allData = function(){
 	var tasks = [];
-	var request = new sql.Request(connection);
-	
-	    request.query("SELECT id, name, description, status FROM tasks", function (err, results) {
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    conn.queryRaw("SELECT id, name, description, status FROM Tasks.Tasks", function (err, results) {
 	        if (err) {
 	            console.error("Error running query! "+err);
 	            return;
@@ -47,9 +34,8 @@ allData = function(){
 	        }
 	        return tasks;
 	    });
-	
+	});
 }
-/*
 addTask = function(task){
 	sql.open(conn_str, function (err, conn) {
 	    if (err) {
