@@ -1,0 +1,28 @@
+<body>
+  <p>New task</p>
+  <div id="newTask">
+    <form id="addTask" method="post" action="/task/add">
+    <table>
+      <tbody>
+        <tr>
+          <td>Enter Task Name</td>
+          <td><input type="text" name="name" placeholder="Task Name" /></td>
+        </tr>
+        <tr>
+          <td>Enter Task Details</td>
+          <td><textarea name="description" placeholder="Task description/details"></textarea></td>
+        </tr>
+        <tr>
+          <td>Enter Task Status</td>
+          <td><input type="text" name="status" placeholder="Task Status" /></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><input type="submit" placeholder="submit details" /></td>
+        </tr>
+      </tbody>
+    </table>
+    </form>
+  </div>
+  <%include footer%>
+</body>

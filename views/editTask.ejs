@@ -1,0 +1,29 @@
+<body>
+  <p>Update task</p>
+  <div id="updateTask">
+    <form id="updateTask" method="post" action="/task/update/<%=task.id%>">
+    <table>
+      <tbody>
+          <input type="hidden" name="id" value="<%=task.id%>"></
+        <tr>
+          <td>Enter Task Name</td>
+          <td><input type="text" name="name" placeholder="Task Name" value="<%=task.name%>" /></td>
+        </tr>
+        <tr>
+          <td>Enter Task Details</td>
+          <td><textarea name="description" placeholder="Task description/details"><%=task.description%></textarea></td>
+        </tr>
+        <tr>
+          <td>Enter Task Status</td>
+          <td><input type="text" name="status" placeholder="Task Status" value="<%=task.status%>" /></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><input type="submit" /></td>
+        </tr>
+      </tbody>
+    </table>
+    </form>
+  </div>
+  <%include footer%>
+</body>
