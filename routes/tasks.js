@@ -1,149 +1,98 @@
-/*var sql = require('node-sqlserver');
-*//*var conn_str = "Driver={SQL Server Native Client 11.0};Server=(local);Database=AdventureWorks2012;Trusted_Connection={Yes}";
-*/
 var sql = require('mssql'); 
-
-
 
 var conn_str = {
     user: 'sa',
     password: 'root',
     server: '127.0.0.1', // You can use 'localhost\\instance' to connect to named instance
     database: 'nodedb',
-
-    options: {
-       // encrypt: true // Use this if you're on Windows Azure
-    }
 }
 
-
-
 var connection = new sql.Connection(conn_str, function(err) {
-
 
 	if (err) {
 		console.log("Problem In opening connection "+err);
 	};
 });
 
-var tasks = [];
-allData = function(req, res){
-	
+allData = function(req, res, render){
+	var tasks = [];
 	var request = new sql.Request(connection);
-	
-	    request.query("SELECT id, name, description, status FROM tasks", function (err, results) {
-	        if (err) {
-	            console.error("Error running query! "+err);
-	            return;
-	        }
 
-results.map(function(results){
+    request.query("SELECT id, name, description, status FROM tasks", function (err, results) {
+        if (err) {
+            console.error("Error running query! "+err);
+            return;
+        }
 
-
-
-var task = {
-	        		id: results.id,
-	        		name: results.name,
-	        		description: results.description,
-	        		status: results.status,
-	        	};
-	        	tasks.push(task);
-});
-/* return tasks;*/
-
-/*	        console.dir("Hello Raaz"+results.id);
-*/	       /* for (var i = 0; i < results.rows.length; i++) {
-	        	var task = {
-	        		id: results.rows[i][0],
-	        		name: results.rows[i][1],
-	        		description: results.rows[i][2],
-	        		status: results.rows[i][3],
-	        	};
-	        	tasks.push(task);
-	        }*/
-
-	       
- // console.log("rrrrrrrrrrrrrrrr"+JSON.stringify(tasks));
-	//         return tasks;
-	res.render( 'tasklist', {data: tasks});
-
-	    });
-	
-
-
-}
-/*
-addTask = function(task){
-	sql.open(conn_str, function (err, conn) {
-	    if (err) {
-	        console.error("Error opening the connection! "+err);
-	        return;
-	    }
-	    var queryString = "INSERT INTO Tasks.Tasks('name', 'description', 'status') VALUES ('"+
-	    	task.name+"', '"+task.description+"', '"+task.status+"') ";
-
-	    conn.queryRaw(queryString, function (err, results) {
-	        if (err) {
-	            console.error("Error running query! "+err);
-	            return;
-	        }
-	        return tasks;
-	    });
-	});
-}
-findTask = function(id) {
-	sql.open(conn_str, function (err, conn) {
-	    if (err) {
-	        console.error("Error opening the connection! "+err);
-	        return;
-	    }
-	    conn.queryRaw("SELECT id, name, description, status FROM Tasks.Tasks where id="+id, function (err, results) {
-	        if (err) {
-	            console.error("Error running query! "+err);
-	            return;
-	        }
+        results.map(function(results){
         	var task = {
-        		id: results.rows[0][0],
-        		name: results.rows[0][1],
-        		description: results.rows[0][2],
-        		status: results.rows[0][3],
-        	};
-	        return tasks;
+	        	id: results.id,
+	        	name: results.name,
+	        	description: results.description,
+	        	status: results.status,
+	        };
+	        tasks.push(task);
 	    });
+
+		if(render){
+			res.render( 'tasklist', {data: tasks});
+		}else{
+			res.send(JSON.stringify(tasks));
+		}
 	});
 }
-updateTask = function(task){
-	sql.open(conn_str, function (err, conn) {
-	    if (err) {
-	        console.error("Error opening the connection! "+err);
-	        return;
-	    }
-	    var queryString = "UPDATE Tasks.Tasks SET name = '"+task.name+"', description = '"+task.description+"', status = '"+task.status+
-	    "' WHERE id=" + task.id;
 
-	    conn.queryRaw(queryString, function (err, results) {
-	        if (err) {
-	            console.error("Error running query! "+err);
-	            return;
-	        }
-	    });
-	});
+addTask = function(req, res, task){
+	var request = new sql.Request(connection);
+    var queryString = "INSERT INTO tasks('name', 'description', 'status') VALUES ('"+
+    	task.name+"', '"+task.description+"', '"+task.status+"') ";
+    
+    request.query(queryString, function (err, results) {
+        if (err) {
+            console.error("Error running query! "+err);
+            return;
+        }
+    });
+    res.send('Data inserted SuccessFully');
+}
+findTask = function(req, res, render) {
+	var request = new sql.Request(connection);
+
+    request.query("SELECT id, name, description, status FROM tasks WHERE id="+req.params.id, function (err, result) {
+        if (err) {
+            console.error("Error running query! "+err);
+            return;
+        }
+        if(results){
+        	if(render)
+        		res.render('editTask', {task: result});
+        	else
+        		res.send(JSON.stringify(result));
+        }
+    });
+}
+updateTask = function(req, res, task){
+	var request = new sql.Request(connection);
+    var queryString = "UPDATE tasks SET name = '"+task.name+"', description = '"+task.description+"', status = '"+task.status+
+    "' WHERE id=" + task.id;
+    
+    request.query(queryString, function (err, results) {
+        if (err) {
+            console.error("Error running query! "+err);
+            return;
+        }
+        res.send("Updated SuccessFully");
+    });
 }
 removeTask = function(id){
-	sql.open(conn_str, function (err, conn) {
-	    if (err) {
-	        console.error("Error opening the connection! "+err);
-	        return;
-	    }
-	    var queryString = "DELETE FROM Tasks.Tasks WHERE id=" + task.id;
-
-	    conn.queryRaw(queryString, function (err, results) {
-	        if (err) {
-	            console.error("Error running query! "+err);
-	            return;
-	        }
-	    });
-	});
+	var request = new sql.Request(connection);
+    request.query("DELETE FROM tasks WHERE id="+req.params.id, function (err, results) {
+        if (err) {
+            console.error("Error running query! "+err);
+            return;
+        }
+        res.send('Deleted SuccessFully');
+    });
 }
 
 /* List of methods exposed as service/view
@@ -153,23 +102,16 @@ removeTask = function(id){
 
 
 exports.dataList = function(req, res){
-return allData(req, res);
+	return allData(req, res, true);
 };
 
-
-
-
-
-/*exports.dataList = function(req, res){
-	res.render( 'tasklist', {data: allData()});
-};*/
 //Provides all the tasks as object
 exports.list = function(req, res){
-	res.send(allData());
+	allData(req, res, false);
 };
 //Provides a single task object
 exports.view = function(req, res){
-	res.send(findTask(req.params.id));
+	findTask(req, res, false);
 }
 //Provides a view to add new task
 exports.new = function(req, res){
@@ -181,18 +123,15 @@ exports.add = function(req, res){
 	newTask.name = req.body.name;
 	newTask.description = req.body.description;
 	newTask.status = req.body.status;
-	addTask(newTask);
-	res.send('Posted Successfully');
+	addTask(req, res, newTask);
 };
 //removes the provided task
 exports.remove = function(req, res){
 	removeTask(req.params.id);
-	res.redirect("/");
 };
 //Provides a pre-populated form to update task
 exports.change = function(req, res){
-	var oldModel = findTask(req.params.id);
-	res.render('editTask', {task: oldModel});
+	findTask(req, res, true);
 };
 //Updates the provided task
 exports.update = function(req, res){
@@ -202,6 +141,5 @@ exports.update = function(req, res){
 	updatedTask.description = req.body.description;
 	updatedTask.status = req.body.status;
 	console.log(JSON.stringify(updatedTask));
-	updateTask(updatedTask);
-	res.send('Updated Successfully');
+	updateTask(req, res, updatedTask);
 };
