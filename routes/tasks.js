@@ -26,9 +26,9 @@ var connection = new sql.Connection(conn_str, function(err) {
 	};
 });
 
-
-allData = function(){
-	var tasks = [];
+var tasks = [];
+allData = function(req, res){
+	
 	var request = new sql.Request(connection);
 	
 	    request.query("SELECT id, name, description, status FROM tasks", function (err, results) {
@@ -40,7 +40,6 @@ allData = function(){
 results.map(function(results){
 
 
-console.dir("Hello Raaz"+results.id);
 
 var task = {
 	        		id: results.id,
@@ -62,9 +61,16 @@ var task = {
 	        	};
 	        	tasks.push(task);
 	        }*/
-	        return tasks;
+
+	       
+ // console.log("rrrrrrrrrrrrrrrr"+JSON.stringify(tasks));
+	//         return tasks;
+	res.render( 'tasklist', {data: tasks});
+
 	    });
 	
+
+
 }
 /*
 addTask = function(task){
@@ -144,9 +150,19 @@ removeTask = function(id){
  * for the application.
  */
 //Lists all the tasks in a table
+
+
 exports.dataList = function(req, res){
-	res.render( 'tasklist', {data: allData()});
+return allData(req, res);
 };
+
+
+
+
+
+/*exports.dataList = function(req, res){
+	res.render( 'tasklist', {data: allData()});
+};*/
 //Provides all the tasks as object
 exports.list = function(req, res){
 	res.send(allData());
