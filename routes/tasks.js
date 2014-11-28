@@ -8,7 +8,7 @@ var sql = require('mssql');
 var conn_str = {
     user: 'sa',
     password: 'root',
-    server: 'localhost', // You can use 'localhost\\instance' to connect to named instance
+    server: '127.0.0.1', // You can use 'localhost\\instance' to connect to named instance
     database: 'nodedb',
 
     options: {
@@ -36,7 +36,24 @@ allData = function(){
 	            console.error("Error running query! "+err);
 	            return;
 	        }
-	        for (var i = 0; i < results.rows.length; i++) {
+
+results.map(function(results){
+
+
+console.dir("Hello Raaz"+results.id);
+
+var task = {
+	        		id: results.rows[i][0],
+	        		name: results.rows[i][1],
+	        		description: results.rows[i][2],
+	        		status: results.rows[i][3],
+	        	};
+	        	tasks.push(task);
+});
+/* return tasks;*/
+
+/*	        console.dir("Hello Raaz"+results.id);
+*/	       /* for (var i = 0; i < results.rows.length; i++) {
 	        	var task = {
 	        		id: results.rows[i][0],
 	        		name: results.rows[i][1],
@@ -44,7 +61,7 @@ allData = function(){
 	        		status: results.rows[i][3],
 	        	};
 	        	tasks.push(task);
-	        }
+	        }*/
 	        return tasks;
 	    });
 	
