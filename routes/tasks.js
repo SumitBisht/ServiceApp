@@ -1,25 +1,102 @@
-
-var data = [];
-data.push({id:0, name:'swimming', description:'Swim atleast 4 rounds', status: 'in process'});
-data.push({id:1, name:'breakfast', description:'Get the breakfast ready', status: 'to do'});
-data.push({id:2, name:'teaching', description:'teach the next lesson to kids', status: 'to do'});
+var sql = require('node-sqlserver');
+var conn_str = "Driver={SQL Server Native Client 11.0};Server=(local);Database=AdventureWorks2012;Trusted_Connection={Yes}";
 
 allData = function(){
-	return data;
+	var tasks = [];
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    conn.queryRaw("SELECT id, name, description, status FROM Tasks.Tasks", function (err, results) {
+	        if (err) {
+	            console.error("Error running query! "+err);
+	            return;
+	        }
+	        for (var i = 0; i < results.rows.length; i++) {
+	        	var task = {
+	        		id: results.rows[i][0],
+	        		name: results.rows[i][1],
+	        		description: results.rows[i][2],
+	        		status: results.rows[i][3],
+	        	};
+	        	tasks.push(task);
+	        }
+	        return tasks;
+	    });
+	});
 }
 addTask = function(task){
-	task.id = data.length-1;
-	data.push(task);
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    var queryString = "INSERT INTO Tasks.Tasks('name', 'description', 'status') VALUES ('"+
+	    	task.name+"', '"+task.description+"', '"+task.status+"') ";
+
+	    conn.queryRaw(queryString, function (err, results) {
+	        if (err) {
+	            console.error("Error running query! "+err);
+	            return;
+	        }
+	        return tasks;
+	    });
+	});
 }
 findTask = function(id) {
-	return data[id];
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    conn.queryRaw("SELECT id, name, description, status FROM Tasks.Tasks where id="+id, function (err, results) {
+	        if (err) {
+	            console.error("Error running query! "+err);
+	            return;
+	        }
+        	var task = {
+        		id: results.rows[0][0],
+        		name: results.rows[0][1],
+        		description: results.rows[0][2],
+        		status: results.rows[0][3],
+        	};
+	        return tasks;
+	    });
+	});
 }
 updateTask = function(task){
-	data.splice(task.id, 1);
-	data.splice(task.id, 0, task);
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    var queryString = "UPDATE Tasks.Tasks SET name = '"+task.name+"', description = '"+task.description+"', status = '"+task.status+
+	    "' WHERE id=" + task.id;
+
+	    conn.queryRaw(queryString, function (err, results) {
+	        if (err) {
+	            console.error("Error running query! "+err);
+	            return;
+	        }
+	    });
+	});
 }
 removeTask = function(id){
-	data.splice(id, 1);
+	sql.open(conn_str, function (err, conn) {
+	    if (err) {
+	        console.error("Error opening the connection! "+err);
+	        return;
+	    }
+	    var queryString = "DELETE FROM Tasks.Tasks WHERE id=" + task.id;
+
+	    conn.queryRaw(queryString, function (err, results) {
+	        if (err) {
+	            console.error("Error running query! "+err);
+	            return;
+	        }
+	    });
+	});
 }
 
 /* List of methods exposed as service/view
