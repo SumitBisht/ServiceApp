@@ -43,10 +43,10 @@ results.map(function(results){
 console.dir("Hello Raaz"+results.id);
 
 var task = {
-	        		id: results.rows[i][0],
-	        		name: results.rows[i][1],
-	        		description: results.rows[i][2],
-	        		status: results.rows[i][3],
+	        		id: results.id,
+	        		name: results.name,
+	        		description: results.description,
+	        		status: results.status,
 	        	};
 	        	tasks.push(task);
 });
